@@ -82,6 +82,7 @@ class LaunchpadWirebondDriven(QComponent):
                            pad_width='80um',
                            pad_height='80um',
                            pad_gap='58um',
+                           pad_gap_back='58um',
                            taper_height='122um')
     """Default options"""
 
@@ -103,7 +104,7 @@ class LaunchpadWirebondDriven(QComponent):
         taper_height = p.taper_height
         trace_gap = p.trace_gap
 
-        pad_gap = p.pad_gap
+        pad_gap_back = p.pad_gap_back
         #########################################################
 
         # Geometry of main launch structure
@@ -121,9 +122,9 @@ class LaunchpadWirebondDriven(QComponent):
         # Same way applied for pocket
         pocket = draw.Polygon([(0, trace_width_half + trace_gap),
                                (-taper_height, pad_width_half + pad_gap),
-                               (-(pad_height + taper_height + pad_gap),
+                               (-(pad_height + taper_height + pad_gap_back),
                                 pad_width_half + pad_gap),
-                               (-(pad_height + taper_height + pad_gap),
+                               (-(pad_height + taper_height + pad_gap_back),
                                 -(pad_width_half + pad_gap)),
                                (-taper_height, -(pad_width_half + pad_gap)),
                                (0, -(trace_width_half + trace_gap)),
