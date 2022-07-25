@@ -47,15 +47,15 @@ class CapNInterdigital(QComponent):
 
     .. image::
         CapNInterdigital.png
-    
+
     .. meta::
         Cap N Interdigital
-    
+
     Options:
-        * north_width: '10um' -- The width of the 'north' portion of the CPW transmission line
-        * north_gap: '6um' -- The dielectric gap of the 'north' portion of the CPW transmission line
-        * south_width: '10um' -- The width of the 'south' portion of the CPW transmission line
-        * south_gap: '6um' -- The dielectric gap of the 'south' portion of the CPW transmission line
+        * north_width: 'cpw_width' -- The width of the 'north' portion of the CPW transmission line
+        * north_gap: 'cpw_gap' -- The dielectric gap of the 'north' portion of the CPW transmission line
+        * south_width: 'cpw_width' -- The width of the 'south' portion of the CPW transmission line
+        * south_gap: 'cpw_gap' -- The dielectric gap of the 'south' portion of the CPW transmission line
             (also for the capacitor gap to ground)
         * cap_width: '10um' -- The width of the finger capacitor metal (and islands)
         * cap_gap: '6um' -- The width of dielectric for the capacitive coupling/fingers
@@ -71,10 +71,10 @@ class CapNInterdigital(QComponent):
 
     #Currently setting the primary CPW length based on the coupling_length
     #May want it to be it's own value that the user can control?
-    default_options = Dict(north_width='10um',
-                           north_gap='6um',
-                           south_width='10um',
-                           south_gap='6um',
+    default_options = Dict(north_width='cpw_width',
+                           north_gap='cpw_gap',
+                           south_width='cpw_width',
+                           south_gap='cpw_gap',
                            cap_width='10um',
                            cap_gap='6um',
                            cap_gap_ground='6um',
@@ -84,8 +84,8 @@ class CapNInterdigital(QComponent):
     """Default connector options"""
 
     TOOLTIP = """Generates a two pin (+) structure
-     comprised of a north CPW transmission line, 
-     and a south transmission line, coupled 
+     comprised of a north CPW transmission line,
+     and a south transmission line, coupled
      together via a finger capacitor."""
 
     def make(self):
