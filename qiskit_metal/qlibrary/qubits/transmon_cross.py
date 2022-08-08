@@ -81,6 +81,14 @@ class TransmonCross(BaseQubit):  # pylint: disable=invalid-name
             claw_gap='6um',
             connector_location=
             '0'  # 0 => 'west' arm, 90 => 'north' arm, 180 => 'east' arm
+        ),
+        make_jj_drive=True,
+        jj_drive_options=Dict(
+            v_offset = '5um',
+            h_offset = '0um',
+            rotation = '0',
+            cpw_width = '8um',
+            cpw_gap = '4um',
         ))
     """Default options."""
 
@@ -154,6 +162,8 @@ class TransmonCross(BaseQubit):  # pylint: disable=invalid-name
         """Goes through connector pads and makes each one."""
         for name in self.options.connection_pads:
             self.make_connection_pad(name)
+        if self.options.make_jj_drive:
+            self.make_jj_drive()
 
     def make_connection_pad(self, name: str):
         """Makes individual connector pad.
@@ -226,3 +236,54 @@ class TransmonCross(BaseQubit):  # pylint: disable=invalid-name
                            chip=chip)
 
         self.add_pin(name, port_line.coords, c_w)
+
+    def make_jj_drive(self):
+        # self.p allows us to directly access parsed values (string -> numbers) form the user option
+        p = self.p
+        cross_width = p.cross_width
+        cross_length = p.cross_length
+        cross_gap = p.cross_gap
+
+        # access to chip name
+        chip = p.chip
+
+        jjc = self.p.jj_drive_options  # parser on connector options
+        v_s = jjc.v_offset
+        h_s = jjc.h_offset
+        rotation = jjc.rotation
+        isOpen = jjc.isOpen
+        c_w = jjc.cpw_width
+        c_g = jjc.cpw_gap
+
+        cpw = draw.box(0, -c_w / 2, -4 * c_w, c_w / 2)
+
+        connector_arm = cpw
+        connector_etcher = draw.buffer(connector_arm, c_g)
+
+        # Making the pin for  tracking (for easy connect functions).
+        # Done here so as to have the same translations and rotations as the connector. Could
+        # extract from the connector later, but since allowing different connector types,
+        # this seems more straightforward.
+        port_line = draw.LineString([(-4 * c_w, -c_w / 2), (-4 * c_w, c_w / 2)])
+
+        pos_rotate = 90
+
+        # Rotates and translates the connector polygons (and temporary port_line)
+        polys = [connector_arm, connector_etcher, port_line]
+        polys = draw.rotate(polys, rotation, origin=(0, 0))
+        polys = draw.translate(polys, -(cross_length + cross_gap + v_s),
+                               h_s)
+        polys = draw.rotate(polys, pos_rotate, origin=(0, 0))
+        polys = draw.rotate(polys, p.orientation, origin=(0, 0))
+        polys = draw.translate(polys, p.pos_x, p.pos_y)
+        [connector_arm, connector_etcher, port_line] = polys
+
+        # Generates qgeometry for the connector pads
+        self.add_qgeometry('poly', {'jj_drive_connector_arm': connector_arm},
+                           chip=chip)
+        self.add_qgeometry('poly',
+                           {'jj_drive_connector_etcher': connector_etcher},
+                           subtract=True,
+                           chip=chip)
+
+        self.add_pin('jj_drive', port_line.coords, c_w)
